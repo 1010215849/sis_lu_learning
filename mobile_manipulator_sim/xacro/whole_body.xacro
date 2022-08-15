@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://wiki.ros.org/xacro"
+       name="mm_robot" >
+
+  <!-- common stuff -->
+  <xacro:include filename="$(find mobile_manipulator_sim)/xacro/common.gazebo.xacro" />
+
+  <!-- ur16e -->
+  <xacro:include filename="$(find mobile_manipulator_sim)/xacro/ur16eback.xacro" />
+
+   <!-- mecanum -->
+  <xacro:include filename="$(find mobile_manipulator_sim)/xacro/mecanum.xacro" />  
+
+  <!-- gripper -->
+  <xacro:include filename="$(find robotiq_3f_gripper_sim)/cfg/robotiq-3f-gripper_articulated_macro.xacro" />
+  <xacro:robotiq-3f-gripper_articulated prefix="gripper_"/>
+
+  <xacro:mecanum />
+  <xacro:ur16e_robot prefix="" joint_limited="false"/>
+  <xacro:property name="arm_positon_x" value="0.46"/>
+  <xacro:property name="arm_positon_y" value="0.22"/>
+  <xacro:property name="arm_positon_z" value="0.451"/>
+
+  <joint name="arm_joint" type="fixed">
+    <parent link="z_dir_link" />
+    <child link = "base_urback" />
+    <origin xyz="${arm_positon_x} ${arm_positon_y} ${arm_positon_z}" rpy="0.0 0.0 0.0" />
+  </joint>
+
+
+  <joint name="tool_gripper_joint" type="fixed">
+    <parent link="tool0" />
+    <child link = "gripper_palm" />
+    <origin xyz="0.0 0.0 0.05" rpy="1.5707 0 1.5707" />
+  </joint>
+
+</robot>

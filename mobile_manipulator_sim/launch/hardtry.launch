@@ -1,0 +1,8 @@
+<launch>
+   <!-- 加载机器人模型描述参数 -->
+    <param name="robot_description" command="$(find xacro)/xacro --inorder '$(find mobile_manipulator_sim)/xacro/whole_body.xacro'"/> 
+    <!-- 运行rviz可视化界面 -->
+	<node name="rviz" pkg="rviz" type="rviz" args="-d $(find mobile_manipulator_sim)/config/urdf.rviz" required="true" />
+    <node name="ft_sensor_gazebo_transport_to_ros_topic" pkg="ft_sensor" type="ft_sensor_gazebo_transport_to_ros_topic"/>
+
+</launch>

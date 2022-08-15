@@ -1,0 +1,11 @@
+<launch>
+    <node pkg = "mobile_manipulator_sim" type = "rotate_x.py" name="rotate_x" output = "screen">
+
+    </node>
+    <node pkg = "mobile_manipulator_sim" type = "rotate_y.py" name="rotate_y" output = "screen">
+
+    </node>
+    <node pkg = "mobile_manipulator_sim" type = "arm_circle.py" name="arm_circle" output = "screen">
+
+    </node>   
+</launch>

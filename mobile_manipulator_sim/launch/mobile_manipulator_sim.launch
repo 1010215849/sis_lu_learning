@@ -1,0 +1,72 @@
+<launch>
+
+    <!-- 设置launch文件的参数 -->
+    <arg name="paused" default="false"/>
+    <arg name="use_sim_time" default="true"/>
+    <arg name="gui" default="false"/>
+    <arg name="headless" default="false"/>
+    <arg name="debug" default="true"/>
+    
+    <!-- 运行gazebo仿真环境 -->
+    <include file="$(find gazebo_ros)/launch/empty_world.launch">
+        <arg name="world_name" default="worlds/empty.world"/>
+        <arg name="debug" value="$(arg debug)" />
+        <arg name="gui" value="$(arg gui)" />
+        <arg name="paused" value="$(arg paused)"/>
+        <arg name="use_sim_time" value="$(arg use_sim_time)"/>
+        <arg name="headless" value="$(arg headless)"/>
+    </include>
+
+    <!-- 加载机器人模型描述参数 -->
+    <param name="robot_description" command="$(find xacro)/xacro --inorder '$(find mobile_manipulator_sim)/xacro/whole_body.xacro'"/> 
+
+    <!-- Run a python script to the send a service call to gazebo_ros to spawn a URDF robot -->
+    <!-- <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
+    args="-urdf -model mm_robot -param robot_description -J shoulder_lift_joint -3.14 -J wrist_2_joint 0 -J elbow_joint 0"/> -->
+
+    <!-- <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
+    args="-urdf -model mm_robot -param robot_description -J shoulder_lift_joint -2.5 -J wrist_2_joint 0 -J elbow_joint -1.5"/> -->
+
+    <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
+    args="-urdf -model mm_robot -param robot_description 
+    -J shoulder_pan_joint -0.13185578981508428 
+    -J shoulder_lift_joint -1.6993795833983363
+    -J elbow_joint  -1.8114519119262695
+    -J wrist_1_joint 0.3683568674274902
+    -J wrist_2_joint 1.7031588554382324 
+    -J wrist_3_joint -3.1432390848742884"/>
+
+
+
+      <!-- 运行robot_state_publisher节点，发布tf  -->
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"  output="screen" >
+        <param name="publish_frequency" type="double" value="50.0" />
+    </node>
+
+    <!-- Load ros_control controller configurations -->
+  <rosparam file="$(find mobile_manipulator_sim)/config/joint_state_controller.yaml" command="load" />
+
+  <rosparam file="$(find mobile_manipulator_sim)/config/mecanum_controller.yaml" command="load" />
+
+  <rosparam file="$(find mobile_manipulator_sim)/config/mecanum_controller.yaml" command="load" />
+
+  <rosparam file="$(find mobile_manipulator_sim)/config/arm_controller_ur16e.yaml" command="load"/> 
+
+   <!-- Start the controllers -->
+    <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
+	output="screen" args="joint_state_controller
+    x_dir_controller
+    y_dir_controller 
+    z_dir_controller
+    arm_controller/shoulder_pan_joint
+    arm_controller/shoulder_lift_joint
+    arm_controller/elbow_joint
+    arm_controller/wrist_1_joint
+    arm_controller/wrist_2_joint
+    arm_controller/wrist_3_joint"/>
+  
+    <!-- 运行rviz可视化界面 -->
+	<node name="rviz" pkg="rviz" type="rviz" args="-d $(find mobile_manipulator_sim)/config/mobile_manipulator.rviz" required="true" />
+    <node name="ft_sensor_gazebo_transport_to_ros_topic" pkg="ft_sensor" type="ft_sensor_gazebo_transport_to_ros_topic"/>
+
+</launch>
